@@ -1,40 +1,36 @@
-import PropTypes from 'prop-types';
-import css from './ContactList.module.css';
+import { useDispatch } from 'react-redux';
+import { deleteContact } from 'redux/contactSlice';
+import { useSelector } from 'react-redux';
+import { Box, Button, Item, Text, List } from './ContactList.styled';
 
-const ContactList = props => {
+const ContactList = () => {
+  const contacts = useSelector(state => state.contacts.contacts);
+  const filter = useSelector(state => state.contacts.filter);
+  const dispatch = useDispatch();
+
+  let foundContacts = contacts.filter(contact =>
+    contact.name.toLowerCase().includes(filter)
+  );
+
   return (
-    <div>
-      <ul className={css.contact__list}>
-        {props.contacts.map(({ id, name, number }) => (
-          <li className={css.list__item} key={id}>
-            <p className={css.list__text}>
+    <Box>
+      <List>
+        {contacts.length > 0 ? (foundContacts.map(({ id, name, number }) => (
+          <Item key={id}>
+            <Text>
               {name}: {number}
-            </p>
-
-            <button
-              className={css.list__btn}
+            </Text>
+            <Button
               type="submit"
-              onClick={() => props.onDeleteContact(id)}
+              onClick={() => dispatch(deleteContact({ id }))}
             >
               Delete
-            </button>
-          </li>
-        ))}
-      </ul>
-    </div>
+            </Button>
+          </Item>
+        ))):(<Text>Contact list is empty</Text>)}
+      </List>
+    </Box>
   );
-};
-
-ContactList.protoType = {
-  contact: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number,
-      name: PropTypes.string,
-      number: PropTypes.number,
-    })
-  ),
-
-  onDeleteContact: PropTypes.func,
 };
 
 export default ContactList;
